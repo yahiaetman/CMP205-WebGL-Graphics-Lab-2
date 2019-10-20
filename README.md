@@ -1,4 +1,4 @@
-# WebGL Lab 1
+# WebGL Lab 2
 
 ## Steps to run
 
