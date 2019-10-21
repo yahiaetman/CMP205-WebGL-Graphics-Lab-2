@@ -102,3 +102,4 @@ public
 
 #custom
 dist/
+!.*obj
