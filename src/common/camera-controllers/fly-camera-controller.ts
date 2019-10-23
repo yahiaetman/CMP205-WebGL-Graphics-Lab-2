@@ -7,16 +7,17 @@ import { vec3, vec2 } from 'gl-matrix';
 // Hold Left-Mouse-Button and Drag to rotate camera
 // Hold Left-Mouse-Button + WASD to move and QE to go up or down
 // Mouse Wheel to zoom in or out 
+// Press T to toggle between Perspective and Orthographic
 
 export default class FlyCameraController {
     camera: Camera;
     input: Input;
 
-    pitch: number = 0;
     yaw: number = 0;
+    pitch: number = 0;
 
-    pitchSensitivity: number = 0.001;
     yawSensitivity: number = 0.001;
+    pitchSensitivity: number = 0.001;
     movementSensitivity: number = 0.001;
 
     constructor(camera: Camera, input: Input){
@@ -25,8 +26,8 @@ export default class FlyCameraController {
         this.input = input;
         
         const direction = camera.direction;
-        this.pitch = Math.atan2(direction[2], direction[0]);
-        this.yaw = Math.atan2(direction[1], vec2.len([direction[0], direction[1]]));
+        this.yaw = Math.atan2(direction[2], direction[0]);
+        this.pitch = Math.atan2(direction[1], vec2.len([direction[0], direction[1]]));
     }
 
     public update(deltaTime: number) {
@@ -38,10 +39,10 @@ export default class FlyCameraController {
 
         if(this.input.isButtonDown(0)){
             const mouseDelta = this.input.MouseDelta;
-            this.pitch += mouseDelta[0] * this.pitchSensitivity;
-            this.yaw += -mouseDelta[1] * this.yawSensitivity;
-            this.yaw = Math.min(Math.PI/2, Math.max(-Math.PI/2, this.yaw));
-            this.camera.direction = vec3.fromValues(Math.cos(this.pitch)*Math.cos(this.yaw), Math.sin(this.yaw), Math.sin(this.pitch)*Math.cos(this.yaw))
+            this.yaw += mouseDelta[0] * this.yawSensitivity;
+            this.pitch += -mouseDelta[1] * this.pitchSensitivity;
+            this.pitch = Math.min(Math.PI/2, Math.max(-Math.PI/2, this.pitch));
+            this.camera.direction = vec3.fromValues(Math.cos(this.yaw)*Math.cos(this.pitch), Math.sin(this.pitch), Math.sin(this.yaw)*Math.cos(this.pitch))
             
             const movement = vec3.create();
             if(this.input.isKeyDown("w")) movement[2] += deltaTime * this.movementSensitivity;

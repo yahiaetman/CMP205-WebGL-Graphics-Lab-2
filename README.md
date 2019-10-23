@@ -37,3 +37,4 @@
 * [WebGL2 Fundamentals](https://webgl2fundamentals.org/)
 * [Khronos WebGL2 Reference Guide](https://www.khronos.org/files/webgl20-reference-guide.pdf)
 * [Mozilla WebGL2 API Documentation](https://developer.mozilla.org/en-US/docs/Web/API/WebGL2RenderingContext)
+* [Mouse Picking with Ray Casting](http://antongerdelan.net/opengl/raycasting.html) by Anton Gerdelan.
