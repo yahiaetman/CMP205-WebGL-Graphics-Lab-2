@@ -71,8 +71,11 @@ export default class ExtraScene extends Scene {
         this.fogProgram.setUniformMatrix4fv("VP", false, this.camera.ViewProjectionMatrix);
         this.fogProgram.setUniform3f("cam_position", this.camera.position);
 
-        this.fogProgram.setUniform4f("skyTopColor", [0.2, 0.0, 0.0, 1.0]);
-        this.fogProgram.setUniform4f("skyBottomColor", [0.2, 0.2, 0.4, 1.0]);
+        const skyTopColor = [0.2, 0.0, 0.0, 1.0];
+        const skyBottomColor = [0.2, 0.2, 0.4, 1.0];
+
+        this.fogProgram.setUniform4f("skyTopColor", skyTopColor);
+        this.fogProgram.setUniform4f("skyBottomColor", skyBottomColor);
         this.fogProgram.setUniform1f("fogDistance", 50);
 
         let MatGround = mat4.create();
@@ -84,7 +87,7 @@ export default class ExtraScene extends Scene {
 
         for(let x = -180; x < 180; x+=6){
             for(let z = -180; z < 180; z+=6){
-                // some code to draw the cube-scape (details are not important)
+                // some code to draw the cube landscape (details are not important, just for fun)
                 let distanceSqr = (x*x+z*z);
                 let top = 10 + 800 * Math.exp(-distanceSqr/960);
                 const r = 40;
@@ -110,23 +113,29 @@ export default class ExtraScene extends Scene {
         this.suzanne.draw(this.gl.TRIANGLES);
 
         this.gl.cullFace(this.gl.FRONT); // Since the sky cube will be drawn from the inside, we flip the back-face culling to front face culling
+        this.gl.depthMask(false); // Since the sky is the farthest thing in the scene, we can skip writing to the depth buffer (for Optimization only)
+        // Note that the depth mask function will not disable the depth testing but will prevent us from modifying the depth buffer
+        // There are similar functions for the color and stencil buffer:
+        // gl.colorMask(red: boolean, green: boolean, blue: boolean, alpha: boolean) => controls writing to every channel in the color buffer
+        // gl.stencilMask(mask: number) => controls writing to every bit in the stencil buffer
 
         this.skyProgram.use();
         this.skyProgram.setUniformMatrix4fv("VP", false, this.camera.ViewProjectionMatrix);
         this.skyProgram.setUniform3f("cam_position", this.camera.position);
-        this.skyProgram.setUniform4f("skyTopColor", [0.2, 0.0, 0.0, 1.0]);
-        this.skyProgram.setUniform4f("skyBottomColor", [0.2, 0.2, 0.4, 1.0]);
+        this.skyProgram.setUniform4f("skyTopColor", skyTopColor);
+        this.skyProgram.setUniform4f("skyBottomColor", skyBottomColor);
         this.skyProgram.setUniform3f("sunDirection", vec3.normalize(vec3.create(), [1.0, 2.0, 1.0]));
         this.skyProgram.setUniform1f("sunSize", 0.15);
         this.skyProgram.setUniform1f("sunHalo", 0.015);
         this.skyProgram.setUniform4f("sunColor", [0.7, 0.6, 0.5, 1.0]);
 
         let MatSky = mat4.create();
-        mat4.translate(MatSky, MatSky, this.camera.position);
+        mat4.translate(MatSky, MatSky, this.camera.position); // Make sure that the box is centered around the camera
         this.skyProgram.setUniformMatrix4fv("M", false, MatSky);
         this.cube.draw(this.gl.TRIANGLES);
 
         this.gl.cullFace(this.gl.BACK); // Return Back-face culling to normal
+        this.gl.depthMask(true); // Re-enable writing to the depth buffer
     }
     
     public end(): void {
